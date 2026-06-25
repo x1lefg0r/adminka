@@ -52,6 +52,50 @@ echo "\$HOME"  # то же через двойные кавычки
 
 ---
 
+## IFS — Internal Field Separator
+
+IFS определяет по каким символам bash режет строку на токены на этапе word splitting.
+
+По умолчанию: пробел + таб + newline:
+```bash
+str="one two three"
+for word in $str; do echo $word; done
+# → one
+# → two
+# → three
+```
+
+Меняешь IFS — меняется поведение всей оболочки:
+```bash
+IFS=:
+for part in $PATH; do echo $part; done
+# → /usr/local/bin
+# → /usr/bin
+# → /bin
+```
+
+Удобно парсить PATH, /etc/passwd, любые CSV-подобные строки.
+
+Всегда восстанавливай после изменения:
+```bash
+OLD_IFS=$IFS
+IFS=:
+# делаем что нужно
+IFS=$OLD_IFS
+
+# или через subshell — не трогает текущую оболочку:
+(IFS=: && for part in $PATH; do echo $part; done)
+```
+
+`IFS=` (пустой) — отключает word splitting полностью. Используется в безопасном чтении файлов:
+```bash
+while IFS= read -r line; do
+    echo "$line"
+done < file.txt
+```
+
+---
+
 ## 1.2. Переменные окружения vs локальные переменные
 
 ```bash
